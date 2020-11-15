@@ -4,10 +4,13 @@ import { AgmCoreModule } from '@agm/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { DirectionsMapDirective } from './directions-map.directive';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+
+    DirectionsMapDirective
   ],
   imports: [
     BrowserModule,

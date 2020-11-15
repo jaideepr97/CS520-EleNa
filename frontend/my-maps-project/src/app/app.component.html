@@ -1,7 +1,12 @@
-<h1>{{ title }}</h1>
+<agm-map appDirectionsMap [showDirection]="this.displayDirections"
+         [origin]="origin"
+         [destination]="destination"
 
-<!-- this creates a google map on the page with the given lat/lng from -->
-<!-- the component as the initial center of the map: -->
-<agm-map [latitude]="lat" [longitude]="lng">
-  <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
+         [zoom]="zoom"
+         [disableDefaultUI]="false">
+
+    <agm-marker
+            [latitude]="origin.latitude"
+            [longitude]="origin.longitude">
+    </agm-marker>
 </agm-map>
