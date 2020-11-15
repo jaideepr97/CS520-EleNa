@@ -1,3 +1,7 @@
 agm-map {
     height: 300px;
   }
+
+  mat-slider {
+    width: 300px;
+  }
