@@ -5,6 +5,35 @@
   </mat-toolbar>
 </p>
 
+
+<form>
+  <div>
+    <label for="name">
+      Source
+    </label>
+    <input id="name" type="text" >
+  </div>
+  <br>
+  <div>
+    <label for="name">
+      Destination
+    </label>
+    <input id="name" type="text" >
+  </div>
+  <br>
+  <span>Elevation Choice</span><br><br>    
+                        <mat-radio-group>    
+                            <mat-radio-button value="Min">Min</mat-radio-button>    
+                            <mat-radio-button value="Max">Max</mat-radio-button>    
+                        </mat-radio-group>
+                        <br><br>
+                        <span>Select percentage of shortest distance</span><br>
+                        <mat-slider min="0" max="100" step="1" value="1" thumbLabel tickInterval="1"></mat-slider><br>
+                        <button mat-raised-button color="primary" type="submit">Get direction</button>    
+                      
+                      </form>
+<br><br>
+
 <agm-map appDirectionsMap [showDirection]="this.displayDirections"
          [origin]="origin"
          [destination]="destination"
