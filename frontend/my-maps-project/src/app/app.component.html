@@ -51,20 +51,23 @@
 
 
 <div class="col s6">
-  <agm-map [latitude]="originLat" [longitude]="originLng" [fitBounds]="true">
-    <agm-marker [agmFitBounds]="true" [latitude]="originLat" [longitude]="originLng" [markerDraggable]=true [iconUrl] = "{url: './assets/67872.svg', scaledSize: {
+  <agm-map [latitude]="originLat" [longitude]="originLng" [zoom] = 12>
+    <agm-marker [latitude]="originLat" [longitude]="originLng" [markerDraggable]=true [iconUrl] = "{url: './assets/67872.svg', scaledSize: {
       width: 40,
       height: 60
   }}" (dragEnd)="endDragOrigin($event)">
 
     </agm-marker>
-    <agm-marker [agmFitBounds]="true"  [latitude]="destinationLat" [longitude]="destinationLng" [markerDraggable]=true [iconUrl] = "{url: './assets/map.svg', scaledSize: {
+    <agm-marker [latitude]="destinationLat" [longitude]="destinationLng" [markerDraggable]=true [iconUrl] = "{url: './assets/map.svg', scaledSize: {
       width: 40,
       height: 60
   }}" (dragEnd)="endDragDestination($event)"></agm-marker>
   </agm-map>
 
   Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+  <div>
+    Statistics Division
+  </div>
   
 </div>
 
