@@ -24,5 +24,3 @@ urlpatterns = [
     path('find_route/', include('EleNa.routeFinder.urls')),
 ]
 
-apps.get_app_config('django_mako_plus').register_app('UI')
-

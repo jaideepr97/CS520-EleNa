@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_mako_plus',
     'EleNa.UI',
     'EleNa.routeFinder',
 ]
@@ -67,10 +66,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
-    },
-    {
-        'NAME': 'django_mako_plus',
-        'BACKEND': 'django_mako_plus.MakoTemplates',
     },
 ]
 
