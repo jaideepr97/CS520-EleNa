@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import {ILatLng} from './directions-map.directive';
 
 @Component({
     selector: 'app-root',
@@ -8,17 +7,29 @@ import {ILatLng} from './directions-map.directive';
 })
 export class AppComponent {
 
-  // Washington, DC, USA
-  origin: ILatLng = {
-    latitude: 38.889931,
-    longitude: -77.009003
-  };
-  // New York City, NY, USA
-  destination: ILatLng = {
-    latitude: 40.730610,
-    longitude: -73.935242
-  };
-  displayDirections = true;
-  zoom = 14;
-  title="EleNa - Elevation based Navigation"
+  title="EleNa - Elevation based Navigation";
+  originLat = 42.373126;
+  originLng = -72.519827;
+
+  destinationLat = 42.373070; 
+  destinationLng = -72.501176
+  
+  origin = { lat: 42.350489, lng: -72.527421 };
+  destination = { lat: 42.451643, lng: -72.565172 };
+  
+  placeMarker($event): void{
+    console.log($event);
+  }
+
+  endDragOrigin($event: any): void {
+    console.log($event);
+    this.originLat= $event.coords.lat;
+    this.originLng = $event.coords.lng;
+  }
+
+  endDragDestination($event: any): void {
+    console.log($event);
+    this.destinationLat = $event.coords.lat;
+    this.destinationLng = $event.coords.lng;
+  }
 }
