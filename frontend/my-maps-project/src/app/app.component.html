@@ -62,12 +62,14 @@
       width: 40,
       height: 60
   }}" (dragEnd)="endDragDestination($event)"></agm-marker>
+  <agm-marker [latitude]="location.lat" [longitude]="location.lng" *ngFor="let location of locations; let i=index"></agm-marker>
   </agm-map>
 
+
   Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
-  <div>
+  <!-- <div>
     Statistics Division
-  </div>
+  </div> -->
   
 </div>
 
