@@ -11,6 +11,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {FormsModule} from '@angular/forms';
 import {MatRadioModule} from '@angular/material/radio';
 import {AgmDirectionModule} from 'agm-direction';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import {AgmDirectionModule} from 'agm-direction';
     }),
     BrowserAnimationsModule,
     MatToolbarModule,
-    AgmDirectionModule
+    AgmDirectionModule,
+    MatGridListModule
   ],
   providers: [],
   bootstrap: [AppComponent]

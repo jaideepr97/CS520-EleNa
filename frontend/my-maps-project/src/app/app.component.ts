@@ -8,8 +8,8 @@ import {Component} from '@angular/core';
 export class AppComponent {
 
   title="EleNa - Elevation based Navigation";
-  originLat = 42.373126;
-  originLng = -72.519827;
+  originLat = 42.37173098058097;
+  originLng = -72.60600101123048;
 
   destinationLat = 42.373070; 
   destinationLng = -72.501176
