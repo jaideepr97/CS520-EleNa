@@ -15,7 +15,7 @@ def compute_path_using_yens_with_elevation(graph, src_id, tgt_id, is_min, dist_p
                 root_path = K_shortest[loop_count - 1][0][0:i]
                 for p in K_shortest:
                     if root_path == p[0][0:i]:
-                        copy_nodes[p[0][i]].remove_edge(p[0][i+1])
+                        copy_nodes[p[0][i]].removeEdge(p[0][i+1])
                
                 for node in root_path:
                     del copy_nodes[node]
@@ -86,7 +86,7 @@ def get_best_elevation_path_from_kshortest(graph, K_shortest, is_min):
     paths_with_elevation = []
     for var in K_shortest:
         path = var[0]
-        total_elevation_gain = graph.get_path_elevation(path)
+        total_elevation_gain = graph.getRouteElevation(path)
         paths_with_elevation.append((path, total_elevation_gain, var[1]))
 
     paths_with_elevation.sort(key=lambda x:x[1])
