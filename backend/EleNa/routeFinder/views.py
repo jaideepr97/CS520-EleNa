@@ -1,22 +1,26 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from .mapAccessor import Graph
-from .a_star import binary_search_for_AStar
 import heapq
 import math
 from django.http import HttpResponse
 import json
+# import .algorithms
+from .yens import compute_path_using_yens_with_elevation
+from .a_star import binary_search_for_AStar
+from .djikstras import compute_shortest_distance 
 
 @csrf_exempt
 # Create your views here.
 def find_route(request):
-	source_latitude = float(request.POST.get('source_latitude'))
-	source_longitude = float(request.POST.get('source_longitude'))    
-	destination_latitude = float(request.POST.get('destination_latitude'))
-	destination_longitude = float(request.POST.get('destination_longitude'))
-	percentage = int(request.POST.get('percentage'))
-	elevation_type = request.POST.get('elevation_type')
-	algorithm = request.POST.get('algorithm')
+	request = json.loads(request.body)
+	source_latitude = float(request["source_latitude"])
+	source_longitude = float(request["source_longitude"])   
+	destination_latitude = float(request["destination_latitude"])
+	destination_longitude = float(request["destination_longitude"])
+	percentage = int(request["percentage"])
+	elevation_type = request["elevation_type"]
+	algorithm = request["algorithm"]
 	start_point = (source_latitude, source_longitude)
 	end_point = (destination_latitude, destination_longitude)
 	if elevation_type == 'max':
@@ -27,24 +31,17 @@ def find_route(request):
 	
 	data = dict()
 
-	print(start_point)
-	print(end_point)
-	print(algorithm)
-	print(percentage)
-
 	if algorithm == 'yens':
-		route_yens, yens_elevation, yens_distance = get_yens_route(start_point, end_point, is_min, percentage, G)
-		data['route_yens'] = route_yens
-		data['yens_elevation'] = yens_elevation
-		data['yens_distance'] = yens_distance
+		route, elevation, distance = get_yens_route(start_point, end_point, is_min, percentage, G)
+		data['route'] = route
+		data['elevation'] = elevation
+		data['distance'] = distance
 	if algorithm == 'a_star':
-		route_astar, astar_elevation, astar_distance = get_Astar_route(start_point, end_point, is_min, percentage, G)
-		data['route_astar'] = route_astar
-		data['astar_elevation'] = astar_elevation
-		data['astar_distance'] = astar_distance
+		route, elevation, distance = get_Astar_route(start_point, end_point, is_min, percentage, G)
+		data['route'] = route
+		data['elevation'] = elevation
+		data['distance'] = distance
 
-	print("!!!!!!! returning data")
-	print(data['route_astar'])
 	return HttpResponse(json.dumps(data))
 	# if algorithm == "a_star":
 	# 	return get_Astar_route(source_latitude, source_longitude, destination_latitude, destination_longitude, elevation_type, percentage, G) 
@@ -56,18 +53,17 @@ def find_route(request):
 # 	return retrieve_map()
 
 def get_Astar_route(start_point, end_point, is_min, dist_perc, custom_graph):
-	print("IN ASTAR ROUTE")
 	n_iters = 25
-	start_node = custom_graph.find_nearest_node(start_point[0], start_point[1])
-	end_node = custom_graph.find_nearest_node(end_point[0], end_point[1])
-	_, shortest_distance, _ = custom_graph.compute_shortest_distance(start_node, end_node)
-	route, distance, elevation = custom_graph.binary_search_for_AStar(start_node, end_node, not is_min, (1 + dist_perc/100)*shortest_distance, n_iters)
+	start_node = find_nearest_node(custom_graph, start_point[0], start_point[1])
+	end_node = find_nearest_node(custom_graph, end_point[0], end_point[1])
+	_, shortest_distance, _ = compute_shortest_distance(custom_graph, start_node, end_node)
+	route, distance, elevation = binary_search_for_AStar(custom_graph, start_node, end_node, not is_min, (1 + dist_perc/100)*shortest_distance, n_iters)
 	return convert_route_to_latlong(route, custom_graph.G), elevation, distance
 
 def get_yens_route(start_point, end_point, is_min, dist_perc, custom_graph):
-	start_node = custom_graph.find_nearest_node(start_point[0], start_point[1])
-	end_node = custom_graph.find_nearest_node(end_point[0], end_point[1])
-	route, elevation, distance = custom_graph.compute_path_using_yens_with_elevation(start_node, end_node, is_min, dist_perc)
+	start_node = find_nearest_node(custom_graph, start_point[0], start_point[1])
+	end_node = find_nearest_node(custom_graph, end_point[0], end_point[1])
+	route, elevation, distance = compute_path_using_yens_with_elevation(custom_graph, start_node, end_node, is_min, dist_perc)
 	return convert_route_to_latlong(route, custom_graph.G), elevation, distance
 
 # convert osmid in route to actual lat and long -> (lng, lat) in route_latlng
@@ -75,6 +71,18 @@ def convert_route_to_latlong(route, G):
 	route_lnglat=[]
 	for osid in route:
 		node = G.nodes[osid]
-		route_lnglat.append([node['x'], node['y']])
+		route_lnglat.append([node['y'], node['x']])
 	return route_lnglat
+
+def find_nearest_node(graph, lat, lng):
+        temp_node = None
+        min_distance = 1000000000
+        for node_id in graph.nodes:
+            node = graph.nodes[node_id]
+            distance = (lat - node.latitude) ** 2 + (lng - node.longitude) ** 2
+            distance = math.sqrt(distance)
+            if distance < min_distance:
+                min_distance = distance
+                temp_node = node.osmid
+        return temp_node
 
