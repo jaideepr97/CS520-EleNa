@@ -6,14 +6,12 @@ import heapq
 import copy
 class Graph:
     def __init__(self):
-        # self.G = ox.graph_from_bbox(north=42.5140, south=42.2823, east=-72.2745, west=-72.8034, network_type='drive')
         self.G = ox.graph_from_place({'city': 'Amherst', 'state': 'MA', 'country': 'USA'}, network_type='all_private')
         self.G = ox.elevation.add_node_elevations(self.G, settings.MAP_API_KEY, 350, 0.02, 3)
         self.G = ox.add_edge_grades(self.G)
         self.nodes = self.construct_custom_graph()
 
     def construct_custom_graph(self):
-
         nodes = {}
         for node_id in self.G.nodes():
             osm_data = self.G.nodes[node_id]
