@@ -62,10 +62,10 @@ def djikstras_for_yens(graph, nodes, src_id, tgt_id):
         if min_distances.get(old_id, 1000000000) < old_distance: continue
         temp_edges = nodes[old_id].edges
         for edge in temp_edges:
-            if edge.to_node not in nodes:
+            if edge.destination not in nodes:
                 continue
             new_distance = edge.length + old_distance
-            new_id = edge.to_node
+            new_id = edge.destination
             if new_distance < min_distances.get(new_id, 1000000000):
                 min_distances[new_id] = new_distance
                 extending_from[new_id] = old_id

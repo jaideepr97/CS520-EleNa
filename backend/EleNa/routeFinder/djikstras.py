@@ -14,8 +14,8 @@ def compute_shortest_distance(graph, src_id, tgt_id):
             temp_edges = graph.nodes[old_id].edges
             for edge in temp_edges:
                 new_distance = edge.length + old_distance
-                new_elevation = edge.elevation_diff + elevations[old_id]
-                new_id = edge.to_node
+                new_elevation = edge.elevationGain + elevations[old_id]
+                new_id = edge.destination
                 if new_distance < min_distances.get(new_id, 1000000000):
                     min_distances[new_id] = new_distance
                     elevations[new_id] = new_elevation

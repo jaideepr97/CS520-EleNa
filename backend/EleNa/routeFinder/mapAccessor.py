@@ -20,9 +20,9 @@ class Graph:
             nodes[node_id] = node
 
         for edge in self.G.edges:
-            from_node, to_node, _ = edge
-            edge_length = self.G.get_edge_data(from_node, to_node)[0]['length']
-            nodes[from_node].add_edge(to_node, edge_length, nodes[to_node].elevation)
+            from_node, destination, _ = edge
+            edge_length = self.G.get_edge_data(from_node, destination)[0]['length']
+            nodes[from_node].add_edge(destination, edge_length, nodes[destination].elevation)
 
         return nodes
 
@@ -30,7 +30,7 @@ class Graph:
     def get_path_elevation(self, path):
         total_elevation_gain = 0
         for i in range (0, len(path)-1):
-            total_elevation_gain += self.nodes[path[i]].get_edge(path[i+1]).elevation_diff
+            total_elevation_gain += self.nodes[path[i]].get_edge(path[i+1]).elevationGain
         return total_elevation_gain
 
 class Node:
@@ -41,25 +41,25 @@ class Node:
         self.osmid = osmid
         self.edges = []
 
-    def add_edge(self, to_node, length, to_elevation):
-        edge = Edge(to_node, length, max(to_elevation - self.elevation, 0))
+    def add_edge(self, destination, length, destinationElevation):
+        edge = Edge(destination, length, (destinationElevation - self.elevation))
         self.edges.append(edge)
 
-    def remove_edge(self, to_node):
+    def remove_edge(self, destination):
         for edge in self.edges:
-            if edge.to_node == to_node:
+            if edge.destination == destination:
                 self.edges.remove(edge)
                 return
         return None
 
-    def get_edge(self, to_node):
+    def get_edge(self, destination):
         for edge in self.edges:
-            if edge.to_node == to_node:
+            if edge.destination == destination:
                 return edge
         return None
 
 class Edge:
-    def __init__(self, to_node, length, elevation_diff):
-        self.to_node = to_node
+    def __init__(self, destination, length, elevationGain):
+        self.destination = destination
         self.length = length
-        self.elevation_diff = elevation_diff
+        self.elevationGain = elevationGain

@@ -49,10 +49,10 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
         if old_id == tgt_id: break
         temp_edges = graph.nodes[old_id].edges
         for edge in temp_edges:
-            new_id = edge.to_node
+            new_id = edge.destination
             if new_id in visited: continue
             new_distance = edge.length + distances[old_id]
-            new_elevation = edge.elevation_diff + elevations[old_id]
+            new_elevation = edge.elevationGain + elevations[old_id]
             
             if is_min:
                 new_metric = new_elevation + weight * distance_from_tgt[new_id]

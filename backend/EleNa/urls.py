@@ -20,7 +20,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('EleNa.UI.urls')),
     path('find_route/', include('EleNa.routeFinder.urls')),
 ]
 
