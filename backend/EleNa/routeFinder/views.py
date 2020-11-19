@@ -7,7 +7,7 @@ from django.http import HttpResponse
 import json
 from .yens import compute_path_using_yens_with_elevation
 from .a_star import binary_search_for_AStar
-from .djikstras import compute_shortest_distance
+from .djikstras import findShortestDistance
 from .utilities import getClosestMappedNode 
 
 @csrf_exempt
@@ -39,7 +39,7 @@ def selectAlgorithm(algorithm, source, destination, is_min, percentage, G):
 	closestSource = getClosestMappedNode(G, source)
 	closestDestination = getClosestMappedNode(G, destination)
 	if algorithm == "a_star":
-		shortest_distance = compute_shortest_distance(G, closestSource, closestDestination)
+		shortest_distance = findShortestDistance(G, closestSource, closestDestination)
 		n_iters = 25
 		return binary_search_for_AStar(G, closestSource, closestDestination, not is_min, (1 + percentage/100)*shortest_distance, n_iters)
 	if algorithm == "yens":
