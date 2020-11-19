@@ -43,6 +43,7 @@ export class AppComponent {
   }
 
   onGetDirectionClick(){
+    document.getElementById("MyDiv").innerHTML = "";
     const headers = { 'content-type': 'application/json'}  
     let data = {"source_latitude": this.coordinates["originLat"], 
     "source_longitude": this.coordinates["originLng"], 
@@ -50,7 +51,7 @@ export class AppComponent {
     "destination_longitude": this.coordinates["destinationLng"], 
     "percentage": this.percentage_of_shortest_distance, 
     "elevation_type": this.elevation_choice, 
-    "algorithm": "yens"}
+    "algorithm": "a_star"}
     const body=JSON.stringify(data);
     console.log(body)
     this.http.post(this.serverUrl, body,{'headers':headers}).toPromise()
@@ -71,5 +72,7 @@ export class AppComponent {
       this.locations.push({"lat": entry[0], "lng": entry[1]});
     }
     console.log(this.locations);
+    document.getElementById("MyDiv").innerHTML = "<p>Total Elevation : " + response["elevation"] + 
+    "<br /> Total Distance : "+ response["distance"] + "</p>"
   }
 }
