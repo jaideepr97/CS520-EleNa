@@ -2,7 +2,9 @@ import math
 import heapq
 
 def binary_search_for_AStar(graph, src_id, tgt_id, maximize_elevation, distance_limit, iters):
-	distance_from_tgt = get_distance_from_tgt_id(graph, tgt_id)
+	# distance_from_tgt = get_distance_from_tgt_id(graph, tgt_id)
+	# elevationFromTarget = getElevationFromTarget(graph, tgt_id)
+	distance_from_tgt, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, tgt_id)
 	start_weight, end_weight = 0, 1000000
 	i = 0
 	best_route = best_distance = None
@@ -10,7 +12,7 @@ def binary_search_for_AStar(graph, src_id, tgt_id, maximize_elevation, distance_
 	while (i < iters):
 		curr_weight = (end_weight + start_weight) / 2
 		return_obj = AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt,
-															curr_weight, maximize_elevation)
+															curr_weight, maximize_elevation, elevationFromTarget)
 		route, distance, elevation, is_valid = return_obj
 		if maximize_elevation == True and best_elevation < elevation and is_valid:
 			best_route, best_distance, best_elevation = route, distance, elevation
@@ -28,18 +30,10 @@ def binary_search_for_AStar(graph, src_id, tgt_id, maximize_elevation, distance_
 	for osmid in best_route:
 		node = graph.G.nodes[osmid]
 		calculatedRoute.append([node['y'], node['x']])
-	return calculatedRoute, best_distance, best_elevation
+	return calculatedRoute, best_elevation, best_distance
 
-def get_distance_from_tgt_id(graph, tgt_id):
-	tgt_lat, tgt_lng = graph.nodes[tgt_id].latitude, graph.nodes[tgt_id].longitude
-	distance_from_tgt = {}
-	for node_id in graph.nodes:
-		curr_node = graph.nodes[node_id]
-		distance_from_tgt[node_id] = math.sqrt((curr_node.latitude - tgt_lat) ** 2
-												+ (curr_node.longitude - tgt_lng) ** 2)
-	return distance_from_tgt
 
-def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_min):
+def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_min, elevationFromTarget):
 	a_star_metric = {}
 	elevations = {}
 	distances = {}
@@ -60,7 +54,9 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 			new_elevation = edge.elevationGain + elevations[old_id]
 			
 			if is_min:
-				new_metric = new_elevation + weight * distance_from_tgt[new_id]
+				# new_metric = new_elevation + weight * distance_from_tgt[new_id]
+				new_metric = new_distance + new_elevation + weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
+
 				if new_metric < a_star_metric.get(new_id, 1000000000):
 					a_star_metric[new_id] = new_metric
 					distances[new_id] = new_distance
@@ -69,7 +65,9 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 					heapq.heappush(heap, (new_metric, new_id))
 			
 			elif not is_min:
-				new_metric = new_elevation - weight * distance_from_tgt[new_id]
+				# new_metric = new_elevation - weight * distance_from_tgt[new_id]
+				new_metric = new_distance + new_elevation - weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
+
 				if new_metric > a_star_metric.get(new_id, -1000000000):
 					a_star_metric[new_id] = new_metric
 					distances[new_id] = new_distance
@@ -85,3 +83,24 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 	path.append(src_id)
 	return path[::-1], distances[tgt_id], elevations[tgt_id], distances[tgt_id] <= distance_limit
 
+def getDistanceFromTargetWithElevation(groundDistance, elevationDiff):
+	return math.sqrt(math.pow(groundDistance,2) + math.pow(elevationDiff,2))
+
+def getGroundDistanceAndElevationFromTarget(graph, target):
+	elevationFromTarget = {}
+	groundDistanceFromTarget = {}
+	for osmid in graph.nodes:
+		currentNode = graph.nodes[osmid]
+		elevationFromTarget[osmid] = graph.nodes[target].elevation - currentNode.elevation
+		groundDistanceFromTarget[osmid] = math.sqrt(math.pow((currentNode.latitude - graph.nodes[target].latitude), 2)
+												+ math.pow((currentNode.longitude - graph.nodes[target].longitude), 2))
+	return groundDistanceFromTarget, elevationFromTarget
+
+# def get_distance_from_tgt_id(graph, tgt_id):
+# 	tgt_lat, tgt_lng = graph.nodes[tgt_id].latitude, graph.nodes[tgt_id].longitude
+# 	distance_from_tgt = {}
+# 	for node_id in graph.nodes:
+# 		curr_node = graph.nodes[node_id]
+# 		distance_from_tgt[node_id] = math.sqrt((curr_node.latitude - tgt_lat) ** 2
+# 												+ (curr_node.longitude - tgt_lng) ** 2)
+# 	return distance_from_tgt
