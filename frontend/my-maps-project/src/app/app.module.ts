@@ -13,6 +13,7 @@ import {MatRadioModule} from '@angular/material/radio';
 import {AgmDirectionModule} from 'agm-direction';
 import {MatGridListModule} from '@angular/material/grid-list';
 import { HttpClientModule } from '@angular/common/http';
+import {MatButtonModule} from '@angular/material/button'
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserAnimationsModule,
     MatToolbarModule,
     AgmDirectionModule,
-    MatGridListModule
+    MatGridListModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]
