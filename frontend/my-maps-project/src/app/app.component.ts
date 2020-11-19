@@ -18,10 +18,11 @@ export class AppComponent {
   serverUrl = 'http://localhost:8000/find_route/'
   destinationLat = 42.3777404; 
   destinationLng = -72.5198350;
+  locations = [{ lat: 42.350489, lng: -72.527421 }, { lat: 42.451643, lng: -72.565172 }]
 
   routes;
   elevation_choice;
-  percentage_of_shortest_distance;
+  percentage_of_shortest_distance = 0;
   
   origin = { lat: 42.350489, lng: -72.527421 };
   destination = { lat: 42.451643, lng: -72.565172 };
@@ -62,6 +63,16 @@ export class AppComponent {
   setRoute(response){
     this.routes = response['route']
     console.log(this.routes)
+
+    this.locations = []
+    for (let entry of this.routes) {
+      let new_coordinate = {}
+      // new_coordinate["lat"] = entry[0];
+      // new_coordinate["lng"] = entry[1];
+      this.locations.push({"lat": entry[0], "lng": entry[1]});
+    }
+
+    console.log(this.locations);
   }
 
 //   public markerOptions = {
@@ -77,7 +88,7 @@ export class AppComponent {
 //     suppressMarkers: true,
 //  }
  
-//  setOriginCoordinates(type,event)
+//  setOriginCoordinates(event)
 //     {
 //         let coords=JSON.stringify(event);
 //         let coords3=JSON.parse(coords);
@@ -87,7 +98,7 @@ export class AppComponent {
 //         this.originLng = coords3.lng
 //     }
 
-//     setDestinationCoordinates(type,event)
+//     setDestinationCoordinates(event)
 //     {
 //         let coords=JSON.stringify(event);
 //         let coords3=JSON.parse(coords);
@@ -95,23 +106,23 @@ export class AppComponent {
 //         console.log("updated longitude :: "+coords3.lng);
 //         this.destinationLat = coords3.lat
 //         this.destinationLng = coords3.lng
-//     } 
+    // } 
   
-  placeMarker($event): void{
-    console.log($event);
-  }
+  // placeMarker($event): void{
+  //   console.log($event);
+  // }
 
-  endDragOrigin($event: any): void {
-    console.log($event);
-    this.originLat= $event.coords.lat;
-    this.originLng = $event.coords.lng;
+  // endDragOrigin($event: any): void {
+  //   console.log($event);
+  //   this.originLat= $event.coords.lat;
+  //   this.originLng = $event.coords.lng;
 
-    // this.locations[0] = {lat:this.originLat, lng:this.originLng}
-  }
+  //   this.locations[0] = {lat:this.originLat, lng:this.originLng}
+  // }
 
-  endDragDestination($event: any): void {
-    console.log($event);
-    this.destinationLat = $event.coords.lat;
-    this.destinationLng = $event.coords.lng;
-  }
+  // endDragDestination($event: any): void {
+  //   console.log($event);
+  //   this.destinationLat = $event.coords.lat;
+  //   this.destinationLng = $event.coords.lng;
+  // }
 }

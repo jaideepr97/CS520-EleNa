@@ -62,7 +62,10 @@
       width: 40,
       height: 60
   }}" (dragEnd)="setDestinationCoordinates($event)">  </agm-marker>
-  <agm-marker [latitude]="route[0][0]" [longitude]="route[1][1]" *ngFor="let route of routes; let i=index"></agm-marker>
+  <agm-marker *ngFor="let location of locations" [latitude]="location.lat" [longitude]="location.lng" [iconUrl] = "{url: './assets/circle.svg', scaledSize: {
+    width: 10,
+    height: 10
+}}"></agm-marker>
       <!-- <agm-marker [destination]="destination" [renderOptions]="renderOptions" [markerOptions]="markerOptions" (destinationDrag)="setDestinationCoordinates('direction',$event)">  </agm-marker> -->
       <!-- <agm-marker [latitude]="originLat" [longitude]="originLng" [markerDraggable]=true [iconUrl] = "{url: './assets/67872.svg', scaledSize: {
       width: 40,
