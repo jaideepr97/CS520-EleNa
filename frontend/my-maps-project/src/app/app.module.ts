@@ -12,6 +12,7 @@ import {FormsModule} from '@angular/forms';
 import {MatRadioModule} from '@angular/material/radio';
 import {AgmDirectionModule} from 'agm-direction';
 import {MatGridListModule} from '@angular/material/grid-list';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import {MatGridListModule} from '@angular/material/grid-list';
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     FormsModule,
     MatSliderModule,

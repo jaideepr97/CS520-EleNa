@@ -37,14 +37,14 @@
     </div>
     <br>
     <span>Elevation Choice</span><br><br>    
-    <mat-radio-group>    
-      <mat-radio-button value="Min">Min</mat-radio-button>    
-      <mat-radio-button value="Max">Max</mat-radio-button>    
+    <mat-radio-group id="elevation_choice" [(ngModel)]="elevation_choice">    
+      <mat-radio-button value="min">Min</mat-radio-button>    
+      <mat-radio-button value="max">Max</mat-radio-button>    
     </mat-radio-group>
     <br><br>
     <span>Select percentage of shortest distance</span><br>
-    <mat-slider min="0" max="100" step="1" value="1" thumbLabel tickInterval="1"></mat-slider><br>
-    <button mat-raised-button color="primary" type="submit">Get direction</button>
+    <mat-slider [(ngModel)]="percentage_of_shortest_distance" id="percentage_of_shortest_distance" min="0" max="100" step="1" value="1" thumbLabel tickInterval="1"></mat-slider><br>
+    <button mat-raised-button color="primary" type="submit" (click)="onGetDirectionClick()">Get direction</button>
   <br><br>
 
 </div>
@@ -52,7 +52,19 @@
 
 <div class="col s6">
   <agm-map [latitude]="originLat" [longitude]="originLng" [zoom] = 12>
-    <agm-marker [latitude]="originLat" [longitude]="originLng" [markerDraggable]=true [iconUrl] = "{url: './assets/67872.svg', scaledSize: {
+    <!-- <agm-marker [latitude]="originLat" [longitude]="originLng"></agm-marker> -->
+    <!-- <agm-marker *ngFor="let location of locations" [latitude]="location.lat" [longitude]="location.lng"></agm-marker> -->
+    <agm-marker [latitude]="originLat" [longitude] = "originLng" [markerDraggable]="true" [iconUrl] = "{url: './assets/67872.svg', scaledSize: {
+      width: 40,
+      height: 60
+  }}" (dragEnd)="setOriginCoordinates($event)">  </agm-marker>
+    <agm-marker [latitude]="destinationLat" [longitude] = "destinationLng" [markerDraggable]="true" [iconUrl] = "{url: './assets/map.svg', scaledSize: {
+      width: 40,
+      height: 60
+  }}" (dragEnd)="setDestinationCoordinates($event)">  </agm-marker>
+  <agm-marker [latitude]="route[0][0]" [longitude]="route[1][1]" *ngFor="let route of routes; let i=index"></agm-marker>
+      <!-- <agm-marker [destination]="destination" [renderOptions]="renderOptions" [markerOptions]="markerOptions" (destinationDrag)="setDestinationCoordinates('direction',$event)">  </agm-marker> -->
+      <!-- <agm-marker [latitude]="originLat" [longitude]="originLng" [markerDraggable]=true [iconUrl] = "{url: './assets/67872.svg', scaledSize: {
       width: 40,
       height: 60
   }}" (dragEnd)="endDragOrigin($event)">
@@ -62,7 +74,8 @@
       width: 40,
       height: 60
   }}" (dragEnd)="endDragDestination($event)"></agm-marker>
-  <agm-marker [latitude]="location.lat" [longitude]="location.lng" *ngFor="let location of locations; let i=index"></agm-marker>
+
+  <agm-marker [latitude]="location.lat" [longitude]="location.lng" *ngFor="let location of locations; let i=index"></agm-marker> -->
   </agm-map>
 
 
