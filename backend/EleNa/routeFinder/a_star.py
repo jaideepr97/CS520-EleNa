@@ -2,8 +2,6 @@ import math
 import heapq
 
 def binary_search_for_AStar(graph, src_id, tgt_id, maximize_elevation, distance_limit, iters):
-	# distance_from_tgt = get_distance_from_tgt_id(graph, tgt_id)
-	# elevationFromTarget = getElevationFromTarget(graph, tgt_id)
 	distance_from_tgt, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, tgt_id)
 	start_weight, end_weight = 0, 1000000
 	i = 0
@@ -54,8 +52,8 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 			new_elevation = edge.elevationGain + elevations[old_id]
 			
 			if is_min:
-				# new_metric = new_elevation + weight * distance_from_tgt[new_id]
-				new_metric = new_distance + new_elevation + weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
+				new_metric = new_elevation + weight * distance_from_tgt[new_id]
+				# new_metric = new_distance + new_elevation + weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
 
 				if new_metric < a_star_metric.get(new_id, 1000000000):
 					a_star_metric[new_id] = new_metric
@@ -65,8 +63,8 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 					heapq.heappush(heap, (new_metric, new_id))
 			
 			elif not is_min:
-				# new_metric = new_elevation - weight * distance_from_tgt[new_id]
-				new_metric = new_distance + new_elevation - weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
+				new_metric = new_elevation - weight * distance_from_tgt[new_id]
+				# new_metric = new_distance + new_elevation - weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
 
 				if new_metric > a_star_metric.get(new_id, -1000000000):
 					a_star_metric[new_id] = new_metric
@@ -82,6 +80,7 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 		to_add = extending_from[to_add]
 	path.append(src_id)
 	return path[::-1], distances[tgt_id], elevations[tgt_id], distances[tgt_id] <= distance_limit
+	# return path[::-1], distances[tgt_id], graph.getRouteElevation(path[::-1]), distances[tgt_id] <= distance_limit
 
 def getDistanceFromTargetWithElevation(groundDistance, elevationDiff):
 	return math.sqrt(math.pow(groundDistance,2) + math.pow(elevationDiff,2))

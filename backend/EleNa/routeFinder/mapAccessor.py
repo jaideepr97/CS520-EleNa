@@ -4,12 +4,16 @@ import pickle as pkl
 import math
 import heapq
 import copy
+import pickle as pkl
 class Graph:
     def __init__(self):
         self.G = ox.graph_from_place({'city': 'Amherst', 'state': 'MA', 'country': 'USA'}, network_type='all_private')
         self.G = ox.elevation.add_node_elevations(self.G, settings.MAP_API_KEY, 350, 0.02, 3)
         self.G = ox.add_edge_grades(self.G)
         self.nodes = self.initiateGraph()
+        filehandler = open("graph.pkl","wb")
+        pkl.dump(self,filehandler)
+        filehandler.close()
 
     def initiateGraph(self):
         nodes = {}
@@ -41,7 +45,7 @@ class Node:
         self.edges = []
 
     def addEdge(self, destination, length, destinationElevation):
-        edge = Edge(destination, length, (destinationElevation - self.elevation))
+        edge = Edge(destination, length, max((destinationElevation - self.elevation), 0))
         self.edges.append(edge)
 
     def removeEdge(self, destination):
