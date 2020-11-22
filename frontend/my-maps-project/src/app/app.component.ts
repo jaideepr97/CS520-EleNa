@@ -71,6 +71,7 @@ export class AppComponent {
       let new_coordinate = {}
       this.locations.push({"lat": entry[0], "lng": entry[1]});
     }
+    console.log(this.locations.length)
     console.log(this.locations);
     document.getElementById("MyDiv").innerHTML = "<p>Total Elevation : " + response["elevation"] + 
     "<br /> Total Distance : "+ response["distance"] + "</p>"
