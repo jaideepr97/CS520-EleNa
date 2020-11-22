@@ -54,8 +54,8 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 			new_elevation = edge.elevationGain + elevations[old_id]
 			
 			if is_min:
-				# new_metric = new_elevation + weight * distance_from_tgt[new_id]
-				new_metric = new_distance + new_elevation + weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
+				new_metric = new_elevation + weight * distance_from_tgt[new_id]
+				# new_metric = new_distance + new_elevation + weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
 
 				if new_metric < a_star_metric.get(new_id, 1000000000):
 					a_star_metric[new_id] = new_metric
@@ -65,8 +65,8 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 					heapq.heappush(heap, (new_metric, new_id))
 			
 			elif not is_min:
-				# new_metric = new_elevation - weight * distance_from_tgt[new_id]
-				new_metric = new_distance + new_elevation - weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
+				new_metric = new_elevation - weight * distance_from_tgt[new_id]
+				# new_metric = new_distance + new_elevation - weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
 
 				if new_metric > a_star_metric.get(new_id, -1000000000):
 					a_star_metric[new_id] = new_metric
