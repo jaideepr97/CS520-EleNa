@@ -4,13 +4,44 @@ import pickle as pkl
 import math
 import heapq
 import copy
-import ssl
+import pickle as pkl
+
+
+class Node:
+    def __init__(self, latitude, longitude, elevation, osmid):
+        self.latitude = latitude
+        self.longitude = longitude
+        self.elevation = elevation
+        self.osmid = osmid
+        self.edges = []
+
+    def addEdge(self, destination, length, destinationElevation):
+        edge = Edge(destination, length, max((destinationElevation - self.elevation), 0))
+        self.edges.append(edge)
+
+    def removeEdge(self, destination):
+        for edge in self.edges:
+            if edge.destination == destination:
+                self.edges.remove(edge)
+                return
+        return None
+
+    def getEdge(self, destination):
+        for edge in self.edges:
+            if edge.destination == destination:
+                return edge
+        return None
+        
 class Graph:
     def __init__(self):
         self.G = ox.graph_from_place({'city': 'Amherst', 'state': 'MA', 'country': 'USA'}, network_type='all_private')
+        # self.G = ox.graph_from_bbox(north=42.5140, south=42.2823, east=-72.2745, west=-72.8034, network_type='all_private')
         self.G = ox.elevation.add_node_elevations(self.G, settings.MAP_API_KEY, 350, 0.02, 3)
         self.G = ox.add_edge_grades(self.G)
         self.nodes = self.initiateGraph()
+        # filehandler = open("graph.pkl","wb")
+        # pkl.dump(self,filehandler)
+        # filehandler.close()
 
     def initiateGraph(self):
         nodes = {}
@@ -33,28 +64,6 @@ class Graph:
             routeElevation += self.nodes[route[i]].getEdge(route[i+1]).elevationGain
         return routeElevation
 
-class Node:
-    def __init__(self, latitude, longitude, elevation, osmid):
-        self.latitude = latitude
-        self.longitude = longitude
-        self.elevation = elevation
-        self.osmid = osmid
-        self.edges = []
-
-    def addEdge(self, destination, length, destinationElevation):
-        edge = Edge(destination, length, (destinationElevation - self.elevation))
-        self.edges.append(edge)
-
-    def removeEdge(self, destination):
-        for edge in self.edges:
-            if edge.destination == destination:
-                self.edges.remove(edge)
-                return
-
-    def getEdge(self, destination):
-        for edge in self.edges:
-            if edge.destination == destination:
-                return edge
 
 class Edge:
     def __init__(self, destination, length, elevationGain):

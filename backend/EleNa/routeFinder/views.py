@@ -6,7 +6,7 @@ import math
 from django.http import HttpResponse
 import json
 from .yens import compute_path_using_yens_with_elevation
-from .a_star import binary_search_for_AStar
+from .a_star import getAstarRoute
 from .djikstras import findShortestDistance
 from .utilities import getClosestMappedNode 
 
@@ -27,29 +27,24 @@ def find_route(request):
 	destination = Node(destinationLatitude, destinationLongitude, None, None)
 
 	if elevationType == 'max':
-		is_min = False
+		maximizeElevationGain = True
 	else:
-		is_min = True
+		maximizeElevationGain = False
 	
-	# G = Graph()
 	closestSource = getClosestMappedNode(G, source)
 	closestDestination = getClosestMappedNode(G, destination)
 	shortest_distance = findShortestDistance(G, closestSource, closestDestination)
 	data = dict()
 	data['shortest_distance'] = shortest_distance 
-	data['route'], data['elevation'], data['distance'] = selectAlgorithm(algorithm, source, destination, is_min, percentage, G, shortest_distance)
-
+	data['route'], data['elevation'], data['distance'] = selectAlgorithm(algorithm, source, destination, maximizeElevationGain, percentage, G, shortest_distance)
+	
 	return HttpResponse(json.dumps(data))
 
-def selectAlgorithm(algorithm, source, destination, is_min, percentage, G, shortest_distance):
+def selectAlgorithm(algorithm, source, destination, maximizeElevationGain, percentage, G, shortest_distance):
 	closestSource = getClosestMappedNode(G, source)
 	closestDestination = getClosestMappedNode(G, destination)
 	if algorithm == "a_star":
-		# shortest_distance = findShortestDistance(G, closestSource, closestDestination)
-		n_iters = 25
-		return binary_search_for_AStar(G, closestSource, closestDestination, not is_min, (1 + percentage/100)*shortest_distance, n_iters)
+		permissableDistance = (1 + (percentage/100))*shortest_distance
+		return getAstarRoute(G, closestSource, closestDestination, maximizeElevationGain, permissableDistance)
 	if algorithm == "yens":
-		# shortest_distance = findShortestDistance(G, closestSource, closestDestination)
-		return compute_path_using_yens_with_elevation(G, closestSource, closestDestination, is_min, percentage)
-
-
+		return compute_path_using_yens_with_elevation(G, closestSource, closestDestination, maximizeElevationGain, percentage)
