@@ -1,7 +1,7 @@
 import copy
 import heapq
 
-def compute_path_using_yens_with_elevation(graph, src_id, tgt_id, is_min, dist_perc):
+def compute_path_using_yens_with_elevation(graph, src_id, tgt_id, is_max, dist_perc):
 	copy_nodes = copy.deepcopy(graph.nodes)
 	shortest, min_distance, min_distances = djikstras_for_yens(graph, copy_nodes,src_id,tgt_id)
 	K_shortest = [(shortest, min_distance)]
@@ -46,7 +46,7 @@ def compute_path_using_yens_with_elevation(graph, src_id, tgt_id, is_min, dist_p
 		if loop_count == 5:
 			break
 
-	best_route, elevation, distance = get_best_elevation_path_from_kshortest(graph, K_shortest, is_min)
+	best_route, elevation, distance = get_best_elevation_path_from_kshortest(graph, K_shortest, is_max)
 	calculatedRoute = []
 	for osmid in best_route:
 		node = graph.G.nodes[osmid]
@@ -86,7 +86,7 @@ def djikstras_for_yens(graph, nodes, src_id, tgt_id):
 
 
 # return path with min/max elevation gain
-def get_best_elevation_path_from_kshortest(graph, K_shortest, is_min):
+def get_best_elevation_path_from_kshortest(graph, K_shortest, is_max):
 	paths_with_elevation = []
 	for var in K_shortest:
 		path = var[0]
@@ -94,7 +94,7 @@ def get_best_elevation_path_from_kshortest(graph, K_shortest, is_min):
 		paths_with_elevation.append((path, total_elevation_gain, var[1]))
 
 	paths_with_elevation.sort(key=lambda x:x[1])
-	if is_min:
-		return paths_with_elevation[0]
-	else:
+	if is_max:
 		return paths_with_elevation[-1]
+	else:
+		return paths_with_elevation[0]

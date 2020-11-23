@@ -1,11 +1,11 @@
 
-def findShortestDistance(graph, source, destination):
+def findShortestDistance(graph, source, target):
 
     shortestDistanceDict = {source: (None, 0)}
     currentNode = source
     visited = set()
     
-    while currentNode != destination:
+    while currentNode != target:
         visited.add(currentNode)
         edges = graph.nodes[currentNode].edges
         distanceToCurrentNode = shortestDistanceDict[currentNode][1]
@@ -23,4 +23,4 @@ def findShortestDistance(graph, source, destination):
         next_destinations = {node: shortestDistanceDict[node] for node in shortestDistanceDict if node not in visited}
         currentNode = min(next_destinations, key=lambda k: next_destinations[k][1])
         
-    return shortestDistanceDict[destination][1]
+    return shortestDistanceDict[target][1]

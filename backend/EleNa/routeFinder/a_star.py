@@ -1,17 +1,25 @@
 import math
 import heapq
 
-def binary_search_for_AStar(graph, src_id, tgt_id, maximize_elevation, distance_limit, iters):
-	distance_from_tgt, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, tgt_id)
+def getAstarRoute(graph, source, target, maximize_elevation, distance_limit):
+	distanceFromTarget, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, target)
 	start_weight, end_weight = 0, 1000000
 	i = 0
+	totalIterations = 35
 	best_route = best_distance = None
-	best_elevation = 0 if maximize_elevation else 1000000000
-	while (i < iters):
+	secondBestRoute = None
+	secondBestDistance = None
+	secondBestElevation = None
+	closestToLimit = 1000000
+	best_elevation = 0 if maximize_elevation else 1000000
+	while (i < totalIterations):
 		curr_weight = (end_weight + start_weight) / 2
-		return_obj = AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt,
-															curr_weight, maximize_elevation, elevationFromTarget)
-		route, distance, elevation, is_valid = return_obj
+		route, distance, elevation, is_valid  = AStar(graph, source, target, distance_limit, distanceFromTarget, curr_weight, maximize_elevation, elevationFromTarget)
+		if (distance - distance_limit) < closestToLimit:
+			secondBestRoute = route
+			secondBestDistance = distance
+			secondBestElevation = elevation
+			closestToLimit = distance - distance_limit
 		if maximize_elevation == True and best_elevation < elevation and is_valid:
 			best_route, best_distance, best_elevation = route, distance, elevation
 		if maximize_elevation == False and best_elevation > elevation and is_valid:
@@ -22,7 +30,9 @@ def binary_search_for_AStar(graph, src_id, tgt_id, maximize_elevation, distance_
 			end_weight = curr_weight
 		i += 1
 	if best_route == None:
-		best_route, best_distance, best_elevation = route, distance, elevation
+		# best_route, best_distance, best_elevation = route, distance, elevation
+		best_route, best_distance, best_elevation = secondBestRoute, secondBestDistance, secondBestElevation
+
 	
 	calculatedRoute = []
 	for osmid in best_route:
@@ -31,56 +41,65 @@ def binary_search_for_AStar(graph, src_id, tgt_id, maximize_elevation, distance_
 	return calculatedRoute, best_elevation, best_distance
 
 
-def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_min, elevationFromTarget):
-	a_star_metric = {}
-	elevations = {}
-	distances = {}
-	elevations[src_id] = distances[src_id] = a_star_metric[src_id] = 0
-	heap = [(0, src_id)]
-	extending_from = {}
+def AStar(graph, source, target, distance_limit, distanceFromTarget, weight, maximize_elevation, elevationFromTarget):
+	heuristicScores = {}
+	relativeElevationFromSource = {}
+	routeDistanceFromSource = {}
+	relativeElevationFromSource[source] = routeDistanceFromSource[source] = heuristicScores[source] = 0
+	heap = [(0, source)]
+	predecessors = {}
 	visited = set()
+	
 	while (len(heap) > 0):
-		_, old_id = heapq.heappop(heap)
-		if old_id in visited: continue
-		visited.add(old_id)
-		if old_id == tgt_id: break
-		temp_edges = graph.nodes[old_id].edges
-		for edge in temp_edges:
-			new_id = edge.destination
-			if new_id in visited: continue
-			new_distance = edge.length + distances[old_id]
-			new_elevation = edge.elevationGain + elevations[old_id]
+		# print(route)
+		_, currentNode = heapq.heappop(heap)
+		if currentNode == target: 
+			break
+
+		if currentNode in visited: 
+			continue
+		
+		visited.add(currentNode)
+		currentNodeEdges = graph.nodes[currentNode].edges
+		for edge in currentNodeEdges:
 			
-			if is_min:
-				new_metric = new_elevation + weight * distance_from_tgt[new_id]
-				# new_metric = new_distance + new_elevation + weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
-
-				if new_metric < a_star_metric.get(new_id, 1000000000):
-					a_star_metric[new_id] = new_metric
-					distances[new_id] = new_distance
-					elevations[new_id] = new_elevation
-					extending_from[new_id] = old_id
-					heapq.heappush(heap, (new_metric, new_id))
+			nextNode = edge.destination
+			if nextNode in visited: 
+				continue
+			nextNodeRouteDistance = edge.length + routeDistanceFromSource[currentNode]
+			nextNodeRelElevation = edge.elevationGain + relativeElevationFromSource[currentNode]
 			
-			elif not is_min:
-				new_metric = new_elevation - weight * distance_from_tgt[new_id]
-				# new_metric = new_distance + new_elevation - weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
+			if not maximize_elevation:
+				heuristicScore = nextNodeRelElevation + weight * distanceFromTarget[nextNode]
+				# heuristicScore =  nextNodeRelElevation + weight * getDistanceFromTargetWithElevation(distanceFromTarget[nextNode], elevationFromTarget[nextNode])
+				if heuristicScore < heuristicScores.get(nextNode, 1000000000):
+					heuristicScores[nextNode] = heuristicScore
+					routeDistanceFromSource[nextNode] = nextNodeRouteDistance
+					relativeElevationFromSource[nextNode] = nextNodeRelElevation
+					predecessors[nextNode] = currentNode
+					heapq.heappush(heap, (heuristicScore, nextNode))
+					continue
+			
+			else:
+				# heuristicScore = nextNodeRelElevation - weight * distanceFromTarget[nextNode]
+				heuristicScore = nextNodeRouteDistance + nextNodeRelElevation - weight * getDistanceFromTargetWithElevation(distanceFromTarget[nextNode], elevationFromTarget[nextNode])
+				if heuristicScore > heuristicScores.get(nextNode, -1000000000):
+					heuristicScores[nextNode] = heuristicScore
+					routeDistanceFromSource[nextNode] = nextNodeRouteDistance
+					relativeElevationFromSource[nextNode] = nextNodeRelElevation
+					predecessors[nextNode] = currentNode
+					heapq.heappush(heap, (-heuristicScore, nextNode))
+					continue
 
-				if new_metric > a_star_metric.get(new_id, -1000000000):
-					a_star_metric[new_id] = new_metric
-					distances[new_id] = new_distance
-					elevations[new_id] = new_elevation
-					extending_from[new_id] = old_id
-					heapq.heappush(heap, (-new_metric, new_id))
+	route = []
+	to_add = target
+	while (to_add != source):
+		route.append(to_add)
+		to_add = predecessors[to_add]
+	route.append(source)
+	# return route[::-1], routeDistanceFromSource[target], relativeElevationFromSource[target], routeDistanceFromSource[target] <= distance_limit
+	return route[::-1], routeDistanceFromSource[target], graph.getRouteElevation(route[::-1]), routeDistanceFromSource[target] <= distance_limit
 
-	path = []
-	to_add = tgt_id
-	while (to_add != src_id):
-		path.append(to_add)
-		to_add = extending_from[to_add]
-	path.append(src_id)
-	return path[::-1], distances[tgt_id], elevations[tgt_id], distances[tgt_id] <= distance_limit
-	# return path[::-1], distances[tgt_id], graph.getRouteElevation(path[::-1]), distances[tgt_id] <= distance_limit
 
 def getDistanceFromTargetWithElevation(groundDistance, elevationDiff):
 	return math.sqrt(math.pow(groundDistance,2) + math.pow(elevationDiff,2))
@@ -94,12 +113,3 @@ def getGroundDistanceAndElevationFromTarget(graph, target):
 		groundDistanceFromTarget[osmid] = math.sqrt(math.pow((currentNode.latitude - graph.nodes[target].latitude), 2)
 												+ math.pow((currentNode.longitude - graph.nodes[target].longitude), 2))
 	return groundDistanceFromTarget, elevationFromTarget
-
-# def get_distance_from_tgt_id(graph, tgt_id):
-# 	tgt_lat, tgt_lng = graph.nodes[tgt_id].latitude, graph.nodes[tgt_id].longitude
-# 	distance_from_tgt = {}
-# 	for node_id in graph.nodes:
-# 		curr_node = graph.nodes[node_id]
-# 		distance_from_tgt[node_id] = math.sqrt((curr_node.latitude - tgt_lat) ** 2
-# 												+ (curr_node.longitude - tgt_lng) ** 2)
-# 	return distance_from_tgt
