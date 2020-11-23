@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { MinLengthValidator } from '@angular/forms';
 
 @Component({
     selector: 'app-root',
@@ -7,8 +8,7 @@ import { HttpClient } from '@angular/common/http';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-
+export class AppComponent { 
   constructor(private http: HttpClient) { }
 
   title="EleNa - Elevation based Navigation";
@@ -24,7 +24,7 @@ export class AppComponent {
 
   locations = []
 
-  elevation_choice: String;
+  elevation_choice: String = "min";
   percentage_of_shortest_distance = 0;
   
   origin = { lat: 42.350489, lng: -72.527421 };
