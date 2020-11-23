@@ -34,7 +34,7 @@ class Graph:
     def __init__(self):
         self.G = ox.graph_from_place({'city': 'Amherst', 'state': 'MA', 'country': 'USA'}, network_type='all_private')
         # self.G = ox.graph_from_bbox(north=42.5140, south=42.2823, east=-72.2745, west=-72.8034, network_type='all_private')
-        self.G = ox.elevation.add_node_elevations(self.G, settings.MAP_API_KEY, 350, 0.02, 3)
+        self.G = ox.elevation.add_node_elevations(self.G, 'AIzaSyCfA1DYkPDiQaYEIm4CucGcV_eF9W5c_xQ', 350, 0.02, 3)
         self.G = ox.add_edge_grades(self.G)
         self.nodes = self.initiateGraph()
         # filehandler = open("graph.pkl","wb")

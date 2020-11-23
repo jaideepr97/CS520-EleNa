@@ -22,5 +22,10 @@ def findShortestDistance(graph, source, target):
         
         next_destinations = {node: shortestDistanceDict[node] for node in shortestDistanceDict if node not in visited}
         currentNode = min(next_destinations, key=lambda k: next_destinations[k][1])
-        
-    return shortestDistanceDict[target][1]
+    route = []
+    while currentNode is not None:
+        route.append(currentNode)
+        nextNode = shortestDistanceDict[currentNode][0]
+        currentNode = nextNode
+    route = route[::-1]
+    return route, shortestDistanceDict[target][1]
