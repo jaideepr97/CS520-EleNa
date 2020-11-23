@@ -4,6 +4,7 @@ import pickle as pkl
 import math
 import heapq
 import copy
+import ssl
 class Graph:
     def __init__(self):
         self.G = ox.graph_from_place({'city': 'Amherst', 'state': 'MA', 'country': 'USA'}, network_type='all_private')
@@ -49,13 +50,11 @@ class Node:
             if edge.destination == destination:
                 self.edges.remove(edge)
                 return
-        return None
 
     def getEdge(self, destination):
         for edge in self.edges:
             if edge.destination == destination:
                 return edge
-        return None
 
 class Edge:
     def __init__(self, destination, length, elevationGain):

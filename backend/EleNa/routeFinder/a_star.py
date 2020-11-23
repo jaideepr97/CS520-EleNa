@@ -55,6 +55,7 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 			
 			if is_min:
 				# new_metric = new_elevation + weight * distance_from_tgt[new_id]
+				print(new_id, distance_from_tgt, elevationFromTarget, "    new_id, dis and ele")
 				new_metric = new_distance + new_elevation + weight * getDistanceFromTargetWithElevation(distance_from_tgt[new_id], elevationFromTarget[new_id])
 
 				if new_metric < a_star_metric.get(new_id, 1000000000):
@@ -79,7 +80,11 @@ def AStar(graph, src_id, tgt_id, distance_limit, distance_from_tgt, weight, is_m
 	to_add = tgt_id
 	while (to_add != src_id):
 		path.append(to_add)
-		to_add = extending_from[to_add]
+		try: 
+			to_add = extending_from[to_add]
+		except:
+			to_add = 0
+			tgt_id = 0
 	path.append(src_id)
 	return path[::-1], distances[tgt_id], elevations[tgt_id], distances[tgt_id] <= distance_limit
 

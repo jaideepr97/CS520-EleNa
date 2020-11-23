@@ -23,11 +23,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'r2ab6k_2j#4t3^5*500!f4^-qieq+(4pj#^+riia^*-&l!ehka'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS=['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
+DJANGO_SETTINGS_MODULE='EleNa.settings'
+# Use nose to run all tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+# Tell nose to measure coverage on the ‘foo’ and ‘bar’ apps
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=EleNa',
+]
 
 # Application definition
 
@@ -40,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'EleNa.routeFinder',
     'corsheaders',
+    'django_nose'
 ]
 
 MIDDLEWARE = [
