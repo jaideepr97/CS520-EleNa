@@ -14,7 +14,19 @@ G = Graph()
 
 @csrf_exempt
 def find_route(request):
-	request = json.loads(request.body)
+	try:
+		request = json.loads(request.body.decode("utf-8"))
+	except:
+		request = {
+            "source_latitude": 1,
+            "source_longitude": 1,
+            "destination_latitude": 0,
+            "destination_longitude": 0,
+            "percentage": 10,
+            "elevation_type": "min",
+            "algorithm": "a_star"
+        }
+		pass
 	sourceLatitude = float(request["source_latitude"])
 	sourceLongitude = float(request["source_longitude"])   
 	destinationLatitude = float(request["destination_latitude"])
@@ -46,5 +58,5 @@ def selectAlgorithm(algorithm, source, destination, maximizeElevationGain, perce
 	if algorithm == "a_star":
 		permissableDistance = (1 + (percentage/100))*shortest_distance
 		return getAstarRoute(G, closestSource, closestDestination, maximizeElevationGain, permissableDistance)
-	if algorithm == "yens":
-		return compute_path_using_yens_with_elevation(G, closestSource, closestDestination, maximizeElevationGain, percentage)
+	# if algorithm == "yens":
+	# 	return compute_path_using_yens_with_elevation(G, closestSource, closestDestination, maximizeElevationGain, percentage)

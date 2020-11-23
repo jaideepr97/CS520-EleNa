@@ -2,18 +2,22 @@ import osmnx as ox
 from django.conf import settings
 import pickle as pkl
 import math
+import requests
 import heapq
 import copy
 from django.test import TestCase
 import pickle
 from .utilities import calcStraightLineDistance, getClosestMappedNode
-from .a_star import binary_search_for_AStar, AStar, getDistanceFromTargetWithElevation, getGroundDistanceAndElevationFromTarget
+from .a_star import getAstarRoute, AStar, getDistanceFromTargetWithElevation, getGroundDistanceAndElevationFromTarget
 from .djikstras import findShortestDistance
 from .mapAccessor import Graph, Node
 from .views import find_route
+from django.test.client import RequestFactory
+from django.test import Client
 
 
-class QuestionModelTests(TestCase):
+
+class ElenaTests(TestCase):
     def test_calcStraightLineDistance(self):
         infile = open('graph.pkl', 'rb')
         gr = pickle.load(infile)
@@ -65,17 +69,17 @@ class QuestionModelTests(TestCase):
         self.assertIs(int(target_distance), 0)
         self.assertIs(int(target_elevation), 0)
 
-    def test_AStar_when_target_and_source_diff_2_for_max(self):
+    def test_AStar_when_target_and_source_diff_for_max(self):
         infile = open('graph.pkl', 'rb')
         graph = pickle.load(infile)
         infile.close()
         target_id = 7278370349
-        source_id = 7278370352
+        source_id = 8099446119
         groundDistanceFromTarget, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, target_id)
         paths, target_distance, target_elevation, distances = AStar(graph, target_id, source_id, 10000, groundDistanceFromTarget, 1, True, elevationFromTarget)
-        self.assertIs(int(target_distance), 52)
+        self.assertIs(int(target_distance) > 0, True)
 
-    def test_AStar_when_target_and_source_diff_2_for_min(self):
+    def test_AStar_when_target_and_source_diff_for_min(self):
         infile = open('graph.pkl', 'rb')
         graph = pickle.load(infile)
         infile.close()
@@ -83,10 +87,10 @@ class QuestionModelTests(TestCase):
         source_id = 7278370352
         groundDistanceFromTarget, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, target_id)
         paths, target_distance, target_elevation, distances = AStar(graph, target_id, source_id, 10000, groundDistanceFromTarget, 1, False, elevationFromTarget)
-        self.assertIs(int(target_distance), 506)
+        self.assertIs(int(target_distance), 52)
 
 
-    def test_binary_search_for_AStar(self):
+    def test_getAstarRoute(self):
         infile = open('graph.pkl', 'rb')
         graph = pickle.load(infile)
         infile.close()
@@ -95,20 +99,8 @@ class QuestionModelTests(TestCase):
         maximize_elevation = 10000
         distance_limit = 10000
         iters = 2
-        calculatedRoute, best_elevation, best_distance = binary_search_for_AStar(graph, source_id, target_id, maximize_elevation, distance_limit, iters)
+        calculatedRoute, best_elevation, best_distance = getAstarRoute(graph, source_id, target_id, maximize_elevation, distance_limit)
         self.assertIs(int(best_elevation), 0)
-
-    # def test_binary_search_for_AStar_when_diff(self):
-    #     infile = open('graph.pkl', 'rb')
-    #     graph = pickle.load(infile)
-    #     infile.close()
-    #     target_id = 8099446119
-    #     source_id = 7278370346
-    #     maximize_elevation = 10000
-    #     distance_limit = 10000
-    #     iters = 2
-    #     calculatedRoute, best_elevation, best_distance = binary_search_for_AStar(graph, source_id, target_id, maximize_elevation, distance_limit, iters)
-    #     self.assertNotEqual(int(best_elevation), 0)
 
     def test_dijkstra_findShortestDistance_when_source_dest_same(self):
         infile = open('graph.pkl', 'rb')
@@ -123,8 +115,8 @@ class QuestionModelTests(TestCase):
         graph = pickle.load(infile)
         infile.close()
         target_id = 7278370349
-        source_id = 7278370352
-        self.assertIs(int(findShortestDistance(graph, source_id, target_id)), int(228))
+        source_id = 8099446119
+        self.assertIs(int(findShortestDistance(graph, source_id, target_id))>5965, True)
 
     def test_graph_init(self):
         g = Graph()
@@ -163,5 +155,17 @@ class QuestionModelTests(TestCase):
         edge = n.getEdge(2)
         self.assertIs(edge.destination, 2)
     
-    # def test_find_route(self):
-    #     find_route()
+    def test_find_route(self):
+        data = {
+            "source_latitude": 1,
+            "source_longitude": 1,
+            "destination_latitude": 0,
+            "destination_longitude": 0,
+            "percentage": 10,
+            "elevation_type": "min",
+            "algorithm": "a_star"
+        }
+        c = Client()
+        response = c.post('http://localhost:4200/find_route/', data)
+        self.assertEqual(response.status_code, 200)
+        

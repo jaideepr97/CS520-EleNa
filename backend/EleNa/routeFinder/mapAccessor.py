@@ -24,13 +24,11 @@ class Node:
             if edge.destination == destination:
                 self.edges.remove(edge)
                 return
-        return None
 
     def getEdge(self, destination):
         for edge in self.edges:
             if edge.destination == destination:
                 return edge
-        return None
         
 class Graph:
     def __init__(self):
