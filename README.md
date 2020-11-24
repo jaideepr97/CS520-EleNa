@@ -22,6 +22,6 @@ Steps to run frontend are inside the frontend folder.
 Steps to test:
 
 1. ```cd backend/EleNa/routeFinder```
-2. ```coverage run manage.py test```
+2. ```coverage run ../../manage.py test```
 
 Please contact me at +1 857-346-4247 incase you are facing difficulties to run the code.
