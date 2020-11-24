@@ -3,6 +3,7 @@
 Steps to run the backend server
 - conda activate ox
 - cd into the backend folder
+- pip install django_nose
 - run the command 'python manage.py runserver'
 - The development server will run at http://127.0.0.1:8000/
 
