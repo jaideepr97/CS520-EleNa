@@ -48,7 +48,6 @@ export class AppComponent {
   As soon as response is returned from the server a call to the setRoute() is made passing the response to it as a parameter.
   */
   onGetDirectionClick(){
-    //document.getElementById("StatsDiv").innerHTML = "";
     const headers = { 'content-type': 'application/json'}  
     let data = {"source_latitude": this.coordinates["originLat"], 
     "source_longitude": this.coordinates["originLng"], 
