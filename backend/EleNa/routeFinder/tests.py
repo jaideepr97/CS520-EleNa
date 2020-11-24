@@ -87,7 +87,7 @@ class ElenaTests(TestCase):
         source_id = 7278370352
         groundDistanceFromTarget, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, target_id)
         paths, target_distance, target_elevation, distances = AStar(graph, target_id, source_id, 10000, groundDistanceFromTarget, 1, False, elevationFromTarget)
-        self.assertIs(int(target_distance), 52)
+        self.assertIs(int(target_distance), 210)
 
 
     def test_getAstarRoute(self):
@@ -108,7 +108,8 @@ class ElenaTests(TestCase):
         infile.close()
         target_id = 8099446119
         source_id = 8099446119
-        self.assertIs(int(findShortestDistance(graph, source_id, target_id)), 0)
+        _, shortest_distance = findShortestDistance(graph, source_id, target_id)
+        self.assertIs(int(shortest_distance), 0)
 
     def test_dijkstra_findShortestDistance_when_source_des_diff(self):
         infile = open('graph.pkl', 'rb')
@@ -116,7 +117,8 @@ class ElenaTests(TestCase):
         infile.close()
         target_id = 7278370349
         source_id = 8099446119
-        self.assertIs(int(findShortestDistance(graph, source_id, target_id))>5965, True)
+        _, shortest_distance = findShortestDistance(graph, source_id, target_id)
+        self.assertIs(int(shortest_distance)>5965, True)
 
     def test_graph_init(self):
         g = Graph()
