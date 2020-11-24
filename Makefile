@@ -14,3 +14,4 @@ install:
 		pip install django;
 		pip install django-cors-headers;
 		pip install django_nose;
+		pip install coverage;
