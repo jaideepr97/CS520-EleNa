@@ -55,13 +55,13 @@ def AStar(graph, source, target, permissableDistance, distanceFromTarget, weight
 			# Calculating heuristic score value based on circumstances
 			if not maximize_elevation:
 				heuristicScore = nextNodeRelElevation + weight * distanceFromTarget[nextNode]
-				if heuristicScore < heuristicScores.get(nextNode, 1000000000):
+				if heuristicScore < heuristicScores.get(nextNode, math.inf):
 					heuristicScores[nextNode] = heuristicScore
 					heapq.heappush(heap, (heuristicScore, nextNode))
 			
 			else:
 				heuristicScore = nextNodeRouteDistance + nextNodeRelElevation - weight * getDistanceFromTargetWithElevation(distanceFromTarget[nextNode], elevationFromTarget[nextNode])
-				if heuristicScore > heuristicScores.get(nextNode, -1000000000):
+				if heuristicScore > heuristicScores.get(nextNode, -math.inf):
 					heuristicScores[nextNode] = heuristicScore
 					heapq.heappush(heap, (-heuristicScore, nextNode))
 
@@ -80,13 +80,13 @@ def getAstarRoute(graph, source, target, maximize_elevation, permissableDistance
 	totalIterations = 35
 	distanceFromTarget, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, target)
 	i, low, high = 0, 0, 1000000
-	bestRouteElevation = 0 if maximize_elevation else 1000000
+	bestRouteElevation = 0 if maximize_elevation else math.inf
 	bestRoute = None
 	bestRouteDistance = None
 	secondBestRoute = None
 	secondBestDistance = None
 	secondBestElevation = None
-	closestToLimit = 1000000
+	closestToLimit = math.inf
 		
 	while (i < totalIterations):
 		weight = (high + low)/2
