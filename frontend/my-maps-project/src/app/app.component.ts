@@ -78,7 +78,7 @@ export class AppComponent {
       this.locations.push({"lat": entry[0], "lng": entry[1]});
     }
     console.log(this.locations);
-    document.getElementById("StatsDiv").innerHTML = "<p>Total Elevation : " + response["elevation"] + " feet" +
-    "<br /> Total Distance : "+ response["distance"] + " feet </p>"
+    document.getElementById("StatsDiv").innerHTML = "<p>Total Elevation : " + response["elevation"] + " meters" +
+    "<br /> Total Distance : "+ response["distance"] + " meters </p>"
   }
 }
