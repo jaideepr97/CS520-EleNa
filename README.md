@@ -18,3 +18,5 @@ Please run backend first and then the frontend eventhough they are independent o
 Steps to run backend are inside the backend folder.
 
 Steps to run frontend are inside the frontend folder.
+
+Please contact me at +1 857-346-4247 incase you are facing difficulties to run the code.
