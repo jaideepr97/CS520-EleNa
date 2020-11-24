@@ -1,4 +1,4 @@
-#Infinity Elena
+# Infinity Elena
 
 
 All the steps are assuming that you have a fresh Ubuntu 20.04.1 installation. For mac the steps slightly change for the setup of the environment.
