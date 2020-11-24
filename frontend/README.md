@@ -23,7 +23,7 @@ npm install;
 
 4. Setup the ng alias. This step varies from PC to Mac to Ubuntu Machine. The below step is for ubuntu machine. The path to ng changes.
 ```
-alias ng = "/usr/local/lib/node_modules/@angular/cli/bin/ng";
+alias ng=/usr/local/lib/node_modules/@angular/cli/bin/ng;
 ```
 
 5. Start the angular server. Below command opens the application by default but incase it does not check in localhost: in the webbrowser of your choice
