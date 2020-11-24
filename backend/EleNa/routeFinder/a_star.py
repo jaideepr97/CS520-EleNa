@@ -1,57 +1,35 @@
 import math
 import heapq
 
-def getAstarRoute(graph, source, target, maximize_elevation, distance_limit):
-	distanceFromTarget, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, target)
-	start_weight, end_weight = 0, 1000000
-	i = 0
-	totalIterations = 35
-	best_route = best_distance = None
-	secondBestRoute = None
-	secondBestDistance = None
-	secondBestElevation = None
-	closestToLimit = 1000000
-	best_elevation = 0 if maximize_elevation else 1000000
-	while (i < totalIterations):
-		curr_weight = (end_weight + start_weight) / 2
-		route, distance, elevation, is_valid  = AStar(graph, source, target, distance_limit, distanceFromTarget, curr_weight, maximize_elevation, elevationFromTarget)
-		if (distance - distance_limit) < closestToLimit:
-			secondBestRoute = route
-			secondBestDistance = distance
-			secondBestElevation = elevation
-			closestToLimit = distance - distance_limit
-		if maximize_elevation == True and best_elevation < elevation and is_valid:
-			best_route, best_distance, best_elevation = route, distance, elevation
-		if maximize_elevation == False and best_elevation > elevation and is_valid:
-			best_route, best_distance, best_elevation = route, distance, elevation
-		if is_valid == False:
-			start_weight = curr_weight
-		else:
-			end_weight = curr_weight
-		i += 1
-	if best_route == None:
-		# best_route, best_distance, best_elevation = route, distance, elevation
-		best_route, best_distance, best_elevation = secondBestRoute, secondBestDistance, secondBestElevation
 
-	
-	calculatedRoute = []
-	for osmid in best_route:
-		node = graph.G.nodes[osmid]
-		calculatedRoute.append([node['y'], node['x']])
-	return calculatedRoute, best_elevation, best_distance
+# Returns actual distance between 2 points factoring in co-ordinate distance as well as elevation difference
+def getDistanceFromTargetWithElevation(groundDistance, elevationDiff):
+	return math.sqrt(math.pow(groundDistance,2) + math.pow(elevationDiff,2))
 
+# Creates memoized dictionaries for distances and elevation differences between all graph nodes and selected destination node
+def getGroundDistanceAndElevationFromTarget(graph, target):
+	elevationFromTarget = {}
+	groundDistanceFromTarget = {}
+	for osmid in graph.nodes:
+		currentNode = graph.nodes[osmid]
+		elevationFromTarget[osmid] = graph.nodes[target].elevation - currentNode.elevation
+		groundDistanceFromTarget[osmid] = math.sqrt(math.pow((currentNode.latitude - graph.nodes[target].latitude), 2)
+												+ math.pow((currentNode.longitude - graph.nodes[target].longitude), 2))
+	return groundDistanceFromTarget, elevationFromTarget
 
-def AStar(graph, source, target, distance_limit, distanceFromTarget, weight, maximize_elevation, elevationFromTarget):
-	heuristicScores = {}
+# Performs 1 iteration of A star search based on provided source-target-weight values
+def AStar(graph, source, target, permissableDistance, distanceFromTarget, weight, maximize_elevation, elevationFromTarget):
 	relativeElevationFromSource = {}
 	routeDistanceFromSource = {}
-	relativeElevationFromSource[source] = routeDistanceFromSource[source] = heuristicScores[source] = 0
-	heap = [(0, source)]
+	heuristicScores = {}
 	predecessors = {}
 	visited = set()
+	heuristicScores[source] = 0
+	heap = [(0, source)]
+	relativeElevationFromSource[source] = 0
+	routeDistanceFromSource[source] = 0
 	
 	while (len(heap) > 0):
-		# print(route)
 		_, currentNode = heapq.heappop(heap)
 		if currentNode == target: 
 			break
@@ -66,50 +44,85 @@ def AStar(graph, source, target, distance_limit, distanceFromTarget, weight, max
 			nextNode = edge.destination
 			if nextNode in visited: 
 				continue
+			
+			# Calculating and storing relative Distances and elevations of neighbor node in question
 			nextNodeRouteDistance = edge.length + routeDistanceFromSource[currentNode]
 			nextNodeRelElevation = edge.elevationGain + relativeElevationFromSource[currentNode]
-			
+			predecessors[nextNode] = currentNode
+			routeDistanceFromSource[nextNode] = nextNodeRouteDistance
+			relativeElevationFromSource[nextNode] = nextNodeRelElevation
+
+			# Calculating heuristic score value based on circumstances
 			if not maximize_elevation:
 				heuristicScore = nextNodeRelElevation + weight * distanceFromTarget[nextNode]
-				# heuristicScore =  nextNodeRelElevation + weight * getDistanceFromTargetWithElevation(distanceFromTarget[nextNode], elevationFromTarget[nextNode])
 				if heuristicScore < heuristicScores.get(nextNode, 1000000000):
 					heuristicScores[nextNode] = heuristicScore
-					routeDistanceFromSource[nextNode] = nextNodeRouteDistance
-					relativeElevationFromSource[nextNode] = nextNodeRelElevation
-					predecessors[nextNode] = currentNode
 					heapq.heappush(heap, (heuristicScore, nextNode))
-					continue
 			
 			else:
-				# heuristicScore = nextNodeRelElevation - weight * distanceFromTarget[nextNode]
 				heuristicScore = nextNodeRouteDistance + nextNodeRelElevation - weight * getDistanceFromTargetWithElevation(distanceFromTarget[nextNode], elevationFromTarget[nextNode])
 				if heuristicScore > heuristicScores.get(nextNode, -1000000000):
 					heuristicScores[nextNode] = heuristicScore
-					routeDistanceFromSource[nextNode] = nextNodeRouteDistance
-					relativeElevationFromSource[nextNode] = nextNodeRelElevation
-					predecessors[nextNode] = currentNode
 					heapq.heappush(heap, (-heuristicScore, nextNode))
-					continue
 
+			
+	# Backtracking across accepted nodes and constructing the correct route
 	route = []
-	to_add = target
-	while (to_add != source):
-		route.append(to_add)
-		to_add = predecessors[to_add]
+	currentRouteNode = target
+	while (currentRouteNode != source):
+		route.append(currentRouteNode)
+		currentRouteNode = predecessors[currentRouteNode]
 	route.append(source)
-	# return route[::-1], routeDistanceFromSource[target], relativeElevationFromSource[target], routeDistanceFromSource[target] <= distance_limit
-	return route[::-1], routeDistanceFromSource[target], graph.getRouteElevation(route[::-1]), routeDistanceFromSource[target] <= distance_limit
+	return route[::-1], routeDistanceFromSource[target], graph.getRouteElevation(route[::-1]), routeDistanceFromSource[target] <= permissableDistance
+
+def getAstarRoute(graph, source, target, maximize_elevation, permissableDistance):
+	# Establishing no. of A* iterations to be performed
+	totalIterations = 35
+	distanceFromTarget, elevationFromTarget = getGroundDistanceAndElevationFromTarget(graph, target)
+	i, low, high = 0, 0, 1000000
+	bestRouteElevation = 0 if maximize_elevation else 1000000
+	bestRoute = None
+	bestRouteDistance = None
+	secondBestRoute = None
+	secondBestDistance = None
+	secondBestElevation = None
+	closestToLimit = 1000000
+		
+	while (i < totalIterations):
+		weight = (high + low)/2
+		route, distance, elevation, validRoute  = AStar(graph, source, target, permissableDistance, distanceFromTarget, weight, maximize_elevation, elevationFromTarget)
+		
+		# Finding the route closest to distance limit in case no other route within distance limit can be found
+		if (distance - permissableDistance) < closestToLimit:
+			secondBestRoute = route
+			secondBestDistance = distance
+			secondBestElevation = elevation
+			closestToLimit = distance - permissableDistance
+
+		# Setting calculated metrics and adjusting optimization weight based on previous iteration and requirements
+		if maximize_elevation and validRoute and bestRouteElevation < elevation:
+			bestRoute, bestRouteDistance, bestRouteElevation = route, distance, elevation
+			high = weight
+		elif not maximize_elevation and validRoute and bestRouteElevation > elevation:
+			bestRoute, bestRouteDistance, bestRouteElevation = route, distance, elevation
+			high = weight
+		
+		if not validRoute:
+			low = weight			
+
+		i += 1
+	
+	# Setting metrics to backup values since no valid route could be found
+	if bestRoute == None:
+		bestRoute, bestRouteDistance, bestRouteElevation = secondBestRoute, secondBestDistance, secondBestElevation
+
+	# Constructing route by converting node IDs to their latitudes and longitudes
+	calculatedRoute = []
+	for osmid in bestRoute:
+		node = graph.G.nodes[osmid]
+		calculatedRoute.append([node['y'], node['x']])
+	return calculatedRoute, bestRouteElevation, bestRouteDistance
 
 
-def getDistanceFromTargetWithElevation(groundDistance, elevationDiff):
-	return math.sqrt(math.pow(groundDistance,2) + math.pow(elevationDiff,2))
 
-def getGroundDistanceAndElevationFromTarget(graph, target):
-	elevationFromTarget = {}
-	groundDistanceFromTarget = {}
-	for osmid in graph.nodes:
-		currentNode = graph.nodes[osmid]
-		elevationFromTarget[osmid] = graph.nodes[target].elevation - currentNode.elevation
-		groundDistanceFromTarget[osmid] = math.sqrt(math.pow((currentNode.latitude - graph.nodes[target].latitude), 2)
-												+ math.pow((currentNode.longitude - graph.nodes[target].longitude), 2))
-	return groundDistanceFromTarget, elevationFromTarget
+

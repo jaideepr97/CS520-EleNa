@@ -9,6 +9,7 @@ from .a_star import getAstarRoute
 from .djikstras import findShortestDistance
 from .utilities import getClosestMappedNode 
 
+# initializing graph from osmnx
 G = Graph()
 
 @csrf_exempt
@@ -26,6 +27,8 @@ def find_route(request):
             "algorithm": "a_star"
         }
 		pass
+	
+	# Extracting request parameters
 	sourceLatitude = float(request["source_latitude"])
 	sourceLongitude = float(request["source_longitude"])   
 	destinationLatitude = float(request["destination_latitude"])
@@ -34,6 +37,7 @@ def find_route(request):
 	elevationType = request["elevation_type"]
 	algorithm = request["algorithm"]
 
+	# Creating nodes out of received parameters
 	source = Node(sourceLatitude, sourceLongitude, None, None)
 	destination = Node(destinationLatitude, destinationLongitude, None, None)
 
@@ -42,18 +46,20 @@ def find_route(request):
 	else:
 		maximizeElevationGain = False
 	
+	# Finding the mapped node closest to user's click location
 	closestSource = getClosestMappedNode(G, source)
 	closestDestination = getClosestMappedNode(G, destination)
+
+	# Retrieving djikstra's shortest distance 
 	_ , shortest_distance = findShortestDistance(G, closestSource, closestDestination)
 	data = dict()
 	data['shortest_distance'] = shortest_distance 
-	data['route'], data['elevation'], data['distance'] = selectAlgorithm(algorithm, source, destination, maximizeElevationGain, percentage, G, shortest_distance)
+	data['route'], data['elevation'], data['distance'] = selectAlgorithm(algorithm, source, destination, maximizeElevationGain, percentage, G, shortest_distance, closestSource, closestDestination)
 	
 	return HttpResponse(json.dumps(data))
 
-def selectAlgorithm(algorithm, source, destination, maximizeElevationGain, percentage, G, shortest_distance):
-	closestSource = getClosestMappedNode(G, source)
-	closestDestination = getClosestMappedNode(G, destination)
+# Switch handler in case of future expansion to different algorithms 
+def selectAlgorithm(algorithm, source, destination, maximizeElevationGain, percentage, G, shortest_distance, closestSource, closestDestination):
 	if algorithm == "a_star":
 		permissableDistance = (1 + (percentage/100))*shortest_distance
 		return getAstarRoute(G, closestSource, closestDestination, maximizeElevationGain, permissableDistance)

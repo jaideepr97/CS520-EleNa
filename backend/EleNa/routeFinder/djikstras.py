@@ -1,4 +1,6 @@
 
+
+# Finds the shortest distance and path between 2 nodes using Djikstra's path finding algorithm
 def findShortestDistance(graph, source, target):
 
     shortestDistanceDict = {source: (None, 0)}
