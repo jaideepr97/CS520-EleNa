@@ -12,8 +12,9 @@ Open a new terminal window and navigate to the backend folder
 sudo apt install make;
 ```
 
-3. Navigate into InfinityElena directory. Install osmnx environment. The commands are packaged into make file under the create. This can be run by the command.
+3. Navigate into InfinityElena backend directory. Install osmnx environment. The commands are packaged into make file under the create. This can be run by the command.
 ```
+cd backend
 make create;
 ```
 
