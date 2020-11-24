@@ -1,3 +1,4 @@
+<!-- Declaring the input form for the user to enter values for fields such as origin and destination coordinates-->
 <p>
   <mat-toolbar color="primary">
     <span>EleNa - Elevation based Navigation</span>
@@ -49,7 +50,7 @@
 
 </div>
 
-
+<!-- The below mentioned division contains the google map with draggable markers for origin and destination coordinates -->
 <div class="col s6">
   <agm-map [latitude]="coordinates['originLat']" [longitude]="coordinates['originLng']" [zoom] = 12>
     <agm-marker [latitude]="coordinates['originLat']" [longitude] = "coordinates['originLng']" [markerDraggable]="true" [iconUrl] = "{url: './assets/67872.svg', scaledSize: {
@@ -66,7 +67,7 @@
 }}"></agm-marker>  
   </agm-map>
   Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
-  <div id="MyDiv">
+  <div id="StatsDiv">
     Statistics Division
   </div>
 </div>
